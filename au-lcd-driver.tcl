@@ -18,12 +18,20 @@
 proc checkRequiredFiles { origin_dir} {
   set status true
   set files [list \
- "[file normalize "$origin_dir/ips/clk_wiz_7to1/clk_wiz_7to1.xci"]"\
+ "[file normalize "$origin_dir/vivado_project/au-lcd-driver.srcs/utils_1/imports/synth_1/maincore.dcp"]"\
+  ]
+  foreach ifile $files {
+    if { ![file isfile $ifile] } {
+      puts " Could not find local file $ifile "
+      set status false
+    }
+  }
+
+  set files [list \
  "[file normalize "$origin_dir/ips/clk_wiz_72/clk_wiz_72.xci"]"\
- "[file normalize "$origin_dir/src/design/tx_channel_7to1.v"]"\
- "[file normalize "$origin_dir/src/design/tx_clkgen_7to1.v"]"\
- "[file normalize "$origin_dir/src/design/tx_piso_7to1.v"]"\
- "[file normalize "$origin_dir/src/design/video_lvds.v"]"\
+ "[file normalize "$origin_dir/src/design/clock_generator_pll_7_to_1_diff_ddr.v"]"\
+ "[file normalize "$origin_dir/src/design/n_x_serdes_7_to_1_diff_ddr.v"]"\
+ "[file normalize "$origin_dir/src/design/serdes_7_to_1_diff_ddr.v"]"\
  "[file normalize "$origin_dir/src/design/maincore.v"]"\
  "[file normalize "$origin_dir/src/constraints/au.xdc"]"\
  "[file normalize "$origin_dir/src/testbench/maincore_tb.v"]"\
@@ -151,6 +159,13 @@ set_property -name "simulator.xsim_gcc_version" -value "9.3.0" -objects $obj
 set_property -name "simulator.xsim_version" -value "2023.1" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
+set_property -name "webtalk.activehdl_export_sim" -value "2" -objects $obj
+set_property -name "webtalk.modelsim_export_sim" -value "2" -objects $obj
+set_property -name "webtalk.questa_export_sim" -value "2" -objects $obj
+set_property -name "webtalk.riviera_export_sim" -value "2" -objects $obj
+set_property -name "webtalk.vcs_export_sim" -value "2" -objects $obj
+set_property -name "webtalk.xsim_export_sim" -value "2" -objects $obj
+set_property -name "webtalk.xsim_launch_sim" -value "9" -objects $obj
 set_property -name "xpm_libraries" -value "XPM_CDC" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
@@ -161,26 +176,15 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 # Set 'sources_1' fileset object
 set obj [get_filesets sources_1]
 set files [list \
- [file normalize "${origin_dir}/ips/clk_wiz_7to1/clk_wiz_7to1.xci"] \
  [file normalize "${origin_dir}/ips/clk_wiz_72/clk_wiz_72.xci"] \
- [file normalize "${origin_dir}/src/design/tx_channel_7to1.v"] \
- [file normalize "${origin_dir}/src/design/tx_clkgen_7to1.v"] \
- [file normalize "${origin_dir}/src/design/tx_piso_7to1.v"] \
- [file normalize "${origin_dir}/src/design/video_lvds.v"] \
+ [file normalize "${origin_dir}/src/design/clock_generator_pll_7_to_1_diff_ddr.v"] \
+ [file normalize "${origin_dir}/src/design/n_x_serdes_7_to_1_diff_ddr.v"] \
+ [file normalize "${origin_dir}/src/design/serdes_7_to_1_diff_ddr.v"] \
  [file normalize "${origin_dir}/src/design/maincore.v"] \
 ]
 add_files -norecurse -fileset $obj $files
 
 # Set 'sources_1' fileset file properties for remote files
-set file "$origin_dir/ips/clk_wiz_7to1/clk_wiz_7to1.xci"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "generate_files_for_reference" -value "0" -objects $file_obj
-if { ![get_property "is_locked" $file_obj] } {
-  set_property -name "generate_synth_checkpoint" -value "0" -objects $file_obj
-}
-set_property -name "registered_with_manager" -value "1" -objects $file_obj
-
 set file "$origin_dir/ips/clk_wiz_72/clk_wiz_72.xci"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -217,7 +221,9 @@ set_property -name "file_type" -value "XDC" -objects $file_obj
 
 # Set 'constrs_1' fileset properties
 set obj [get_filesets constrs_1]
+set_property -name "target_constrs_file" -value "[file normalize "$origin_dir/src/constraints/au.xdc"]" -objects $obj
 set_property -name "target_part" -value "xc7a35tftg256-1" -objects $obj
+set_property -name "target_ucf" -value "[file normalize "$origin_dir/src/constraints/au.xdc"]" -objects $obj
 
 # Create 'sim_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sim_1] ""]} {
@@ -244,7 +250,20 @@ set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 
 # Set 'utils_1' fileset object
 set obj [get_filesets utils_1]
-# Empty (no sources present)
+# Add local files from the original project (-no_copy_sources specified)
+set files [list \
+ [file normalize "${origin_dir}/vivado_project/au-lcd-driver.srcs/utils_1/imports/synth_1/maincore.dcp" ]\
+]
+set added_files [add_files -fileset utils_1 $files]
+
+# Set 'utils_1' fileset file properties for remote files
+# None
+
+# Set 'utils_1' fileset file properties for local files
+set file "synth_1/maincore.dcp"
+set file_obj [get_files -of_objects [get_filesets utils_1] [list "*$file"]]
+set_property -name "netlist_only" -value "0" -objects $file_obj
+
 
 # Set 'utils_1' fileset properties
 set obj [get_filesets utils_1]
@@ -276,6 +295,7 @@ if { $obj != "" } {
 }
 set obj [get_runs synth_1]
 set_property -name "part" -value "xc7a35tftg256-1" -objects $obj
+set_property -name "incremental_checkpoint" -value "$proj_dir/au-lcd-driver.srcs/utils_1/imports/synth_1/maincore.dcp" -objects $obj
 set_property -name "auto_incremental_checkpoint" -value "1" -objects $obj
 set_property -name "strategy" -value "Vivado Synthesis Defaults" -objects $obj
 

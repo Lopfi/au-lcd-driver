@@ -9,18 +9,16 @@ always begin
     #5 clk = ~clk;
 end
 
-wire c1_p, c1_n, c2_p, c2_n, c3_p, c3_n, clock_p, clock_n;
+wire clock_p, clock_n;
+wire [2:0] dataout_p, dataout_n;
 
 maincore uut(
-    .CLK100MHZ(clk),
-	.channel1_p(c1_p),
-	.channel1_n(c1_n),
-	.channel2_p(c2_p),
-	.channel2_n(c2_n),
-	.channel3_p(c3_p),
-	.channel3_n(c3_n),
-	.clock_p(clock_p),
-	.clock_n(clock_n)
+    .clk(clk),
+    .rst(rst),
+	.dataout_p(dataout_p), 
+	.dataout_n(dataout_n),
+	.clkout_p(clock_p),
+	.clkout_n(clock_n)
 );
 
  initial begin 
@@ -30,7 +28,7 @@ maincore uut(
     #10
     rst = 0;
     
-    #2000
+    #200000
     $finish;
 end
 

@@ -30,11 +30,11 @@ set_property -dict { PACKAGE_PIN P6   IOSTANDARD LVCMOS33 } [get_ports rst]; ## 
 set_input_delay -clock clk -max 0.6 [get_ports rst];
 
 ## LVDS Outputs
-set_property -dict { PACKAGE_PIN N3   IOSTANDARD LVDS_25 } [get_ports clock_p]; ## C12
-set_property -dict { PACKAGE_PIN N2   IOSTANDARD LVDS_25 } [get_ports clock_n]; ## C11
-set_property -dict { PACKAGE_PIN M5   IOSTANDARD LVDS_25 } [get_ports dataout1_p[0]]; ## C21
-set_property -dict { PACKAGE_PIN N4   IOSTANDARD LVDS_25 } [get_ports dataout1_n[0]]; ## C20
-set_property -dict { PACKAGE_PIN L4   IOSTANDARD LVDS_25 } [get_ports dataout1_p[1]]; ## C18
-set_property -dict { PACKAGE_PIN M4   IOSTANDARD LVDS_25 } [get_ports dataout1_n[1]]; ## C17
-set_property -dict { PACKAGE_PIN P4   IOSTANDARD LVDS_25 } [get_ports dataout1_p[2]]; ## C15
-set_property -dict { PACKAGE_PIN P3   IOSTANDARD LVDS_25 } [get_ports dataout1_n[2]]; ## C14
+set_property -dict { PACKAGE_PIN N3   IOSTANDARD LVDS_25 } [get_ports clkout_p]; ## C12
+set_property -dict { PACKAGE_PIN N2   IOSTANDARD LVDS_25 } [get_ports clkout_n]; ## C11
+set_property -dict { PACKAGE_PIN M5   IOSTANDARD LVDS_25 } [get_ports dataout_p[0]]; ## C21
+set_property -dict { PACKAGE_PIN N4   IOSTANDARD LVDS_25 } [get_ports dataout_n[0]]; ## C20
+set_property -dict { PACKAGE_PIN L4   IOSTANDARD LVDS_25 } [get_ports dataout_p[1]]; ## C18
+set_property -dict { PACKAGE_PIN M4   IOSTANDARD LVDS_25 } [get_ports dataout_n[1]]; ## C17
+set_property -dict { PACKAGE_PIN P4   IOSTANDARD LVDS_25 } [get_ports dataout_p[2]]; ## C15
+set_property -dict { PACKAGE_PIN P3   IOSTANDARD LVDS_25 } [get_ports dataout_n[2]]; ## C14
