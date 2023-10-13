@@ -28,6 +28,7 @@ wire clk100_g;
 wire clk72_g;
 wire pixel_clk;
 
+wire reset;
 
 reg [5:0] Red = 0;
 reg [5:0] Blue = 0;
@@ -47,6 +48,8 @@ reg [10:0] PosY = 0;
 
 reg [7:0] SendFrames = 0;
 
+assign reset = ~rst;
+
 // Input Clock Buffer
 BUFG bg_ref (
     .I             (clk),
@@ -57,7 +60,7 @@ BUFG bg_ref (
 clk_wiz_72 clk_wiz_pixel(
     .clk_in(clk100_g),
     .clk_out(clk72_g),
-    .reset(rst)
+    .reset(reset)
 	);
 
 assign VideoData[20:14]	= {Blue[2],Blue[3],Blue[4],Blue[5],HSync,VSync,DataEnable};
@@ -79,7 +82,7 @@ clock_generator_pll_7_to_1_diff_ddr #(
 	.MMCM_MODE		(2),				// Parameter to set multiplier for MMCM to get VCO in correct operating range. 1 multiplies input clock by 7, 2 multiplies clock by 14, etc
 	.CLKIN_PERIOD 		(13.889))
 clkgen (                        
-	.reset			(rst),
+	.reset			(reset),
 	.clkin		    (clk72_g),
 	.txclk			(txclk),
 	.txclk_div		(txclk_div),
