@@ -29,12 +29,21 @@ create_clock -period 10.00 -waveform {0 5} [get_ports clk];
 set_property -dict { PACKAGE_PIN P6   IOSTANDARD LVCMOS33 } [get_ports rst]; ## IO_25_14
 set_input_delay -clock clk -max 0.6 [get_ports rst];
 
-## LVDS Outputs
-set_property -dict { PACKAGE_PIN N3   IOSTANDARD LVDS_25 } [get_ports clkout_p]; ## C12
-set_property -dict { PACKAGE_PIN N2   IOSTANDARD LVDS_25 } [get_ports clkout_n]; ## C11
-set_property -dict { PACKAGE_PIN M5   IOSTANDARD LVDS_25 } [get_ports dataout_p[0]]; ## C21
-set_property -dict { PACKAGE_PIN N4   IOSTANDARD LVDS_25 } [get_ports dataout_n[0]]; ## C20
-set_property -dict { PACKAGE_PIN L4   IOSTANDARD LVDS_25 } [get_ports dataout_p[1]]; ## C18
-set_property -dict { PACKAGE_PIN M4   IOSTANDARD LVDS_25 } [get_ports dataout_n[1]]; ## C17
-set_property -dict { PACKAGE_PIN P4   IOSTANDARD LVDS_25 } [get_ports dataout_p[2]]; ## C15
-set_property -dict { PACKAGE_PIN P3   IOSTANDARD LVDS_25 } [get_ports dataout_n[2]]; ## C14
+## LVDS Outputs ##LVDS_25
+#set_property -dict { PACKAGE_PIN N3   IOSTANDARD LVDS_25 } [get_ports clkout_p]; ## C12
+#set_property -dict { PACKAGE_PIN N2   IOSTANDARD LVDS_25 } [get_ports clkout_n]; ## C11
+#set_property -dict { PACKAGE_PIN M5   IOSTANDARD LVDS_25 } [get_ports dataout_p[0]]; ## C21
+#set_property -dict { PACKAGE_PIN N4   IOSTANDARD LVDS_25 } [get_ports dataout_n[0]]; ## C20
+#set_property -dict { PACKAGE_PIN L4   IOSTANDARD LVDS_25 } [get_ports dataout_p[1]]; ## C18
+#set_property -dict { PACKAGE_PIN M4   IOSTANDARD LVDS_25 } [get_ports dataout_n[1]]; ## C17
+#set_property -dict { PACKAGE_PIN P4   IOSTANDARD LVDS_25 } [get_ports dataout_p[2]]; ## C15
+#set_property -dict { PACKAGE_PIN P3   IOSTANDARD LVDS_25 } [get_ports dataout_n[2]]; ## C14
+
+set_property -dict { PACKAGE_PIN G2   IOSTANDARD TMDS_33 } [get_ports clkout_p]; ## A21
+set_property -dict { PACKAGE_PIN G1   IOSTANDARD TMDS_33 } [get_ports clkout_n]; ## A20
+set_property -dict { PACKAGE_PIN H2   IOSTANDARD TMDS_33 } [get_ports dataout_p[2]]; ## A18
+set_property -dict { PACKAGE_PIN H1   IOSTANDARD TMDS_33 } [get_ports dataout_n[2]]; ## A17
+set_property -dict { PACKAGE_PIN K1   IOSTANDARD TMDS_33 } [get_ports dataout_p[1]]; ## A15
+set_property -dict { PACKAGE_PIN J1   IOSTANDARD TMDS_33 } [get_ports dataout_n[1]]; ## A14
+set_property -dict { PACKAGE_PIN L3   IOSTANDARD TMDS_33 } [get_ports dataout_p[0]]; ## A12
+set_property -dict { PACKAGE_PIN L2   IOSTANDARD TMDS_33 } [get_ports dataout_n[0]]; ## A11

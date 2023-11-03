@@ -9,13 +9,6 @@ module maincore(
 	output [2:0] dataout_p, dataout_n  // lvds channel 1 data outputs
 	);
 
-/*
-parameter ScreenX = 1366;
-parameter ScreenY = 768;
-parameter BlankingVertical = 12;
-parameter BlankingHorizontal = 169;
-*/
-
 parameter ScreenX = 1366;
 parameter ScreenY = 768;
 parameter BlankingVertical = 12;
@@ -155,12 +148,12 @@ end
 //Video Generator
 always @(posedge pixel_clk)
 begin
-		if(PosX == ScreenX)
-		begin
-				Blue 				<= 0;
-				Red 				<= 0;
+		//if(PosX == ScreenX)
+		//begin
+				Blue 			<= 0;
+				Red 			<= 255;
 				Green 			<= 0;
-		end
+/*		end
 		else
 		begin
 			//Center 640x400 - Screen 640x480 -> Box: 640-320,400-240,640+320,400+240
@@ -190,5 +183,6 @@ begin
 					Green 	<= ( ( (PosY[5:0]+Parallax) ^ (PosX[5:0]+Parallax) 	) * 4	);
 			end
 		end
+		*/
 end
 endmodule
