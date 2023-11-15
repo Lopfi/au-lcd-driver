@@ -151,7 +151,7 @@ begin
 		//if(PosX == ScreenX)
 		//begin
 				Blue 			<= 0;
-				Red 			<= 255;
+				Red 			<= 63;
 				Green 			<= 0;
 /*		end
 		else
