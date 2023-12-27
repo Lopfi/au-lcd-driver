@@ -32,3 +32,9 @@ fp-info-cache
 *.csv
 
 *.lck
+
+
+*/lib/*
+*/*/production/*
+au-lcd-shield/tmds33-R/fp-lib-table
+au-lcd-shield/tmds33-R/sym-lib-table
