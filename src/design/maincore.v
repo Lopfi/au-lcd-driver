@@ -4,9 +4,10 @@
 module maincore(
     input clk,	//100MHz clk in
     input rst,	//reset button
-	//lvds outputs
-	output clkout_p, clkout_n,
-	output [2:0] dataout_p, dataout_n  // lvds channel 1 data outputs
+    output led_en, led_pwm,
+	//lvds outputs	
+	output clkout,
+	output [2:0] dataout
 	);
 
 parameter ScreenX = 1366;
@@ -42,6 +43,9 @@ reg [10:0] PosY = 0;
 reg [7:0] SendFrames = 0;
 
 assign reset = ~rst;
+
+assign led_en = 1;
+assign led_pwm = 1;
 
 // Input Clock Buffer
 BUFG bg_ref (
@@ -90,15 +94,13 @@ n_x_serdes_7_to_1_diff_ddr #(
       	.D			(D),
       	.N			(N),				// 1 channel
 	.DATA_FORMAT 		("PER_CLOCK")) 			// PER_CLOCK or PER_CHANL data formatting
-dataout (                      
-	.dataout_p  		(dataout_p),
-	.dataout_n  		(dataout_n),
-	.clkout_p  		(clkout_p),
-	.clkout_n  		(clkout_n),
-	.txclk    		(txclk),
-	.txclk_div    		(txclk_div),
-	.pixel_clk		(pixel_clk),
-	.reset   		(not_tx_mmcm_lckd),
+data_tx (                      
+	.dataout	    (dataout),			// single ended output data
+	.clkout 	    (clkout),			// output clock
+	.txclk    	    (txclk),
+	.txclk_div      (txclk_div),
+	.pixel_clk	    (pixel_clk),
+	.reset   	    (not_tx_mmcm_lckd),
 	.clk_pattern  		(7'b1100011),			// Transmit a constant to make the clock
 	.datain  		(VideoData)
 	);

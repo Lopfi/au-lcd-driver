@@ -54,7 +54,7 @@
 
 `timescale 1ps/1ps
 
-module n_x_serdes_7_to_1_diff_ddr (txclk, reset, pixel_clk, txclk_div, datain, clk_pattern, dataout_p, dataout_n, clkout_p, clkout_n) ;
+module n_x_serdes_7_to_1_diff_ddr (txclk, reset, pixel_clk, txclk_div, datain, clk_pattern, clkout, dataout) ;
 
 parameter integer 	N = 8 ;				// Set the number of channels
 parameter integer	D = 6 ;				// Set the number of outputs per channel
@@ -66,10 +66,8 @@ input 			pixel_clk ;			// clock at pixel rate
 input			txclk_div ;			// 1/2 rate clock output for gearbox
 input 	[(D*N*7)-1:0]	datain ;  			// Data for output
 input 	[6:0]		clk_pattern ;  			// clock pattern for output
-output 	[D*N-1:0]	dataout_p ;			// output data
-output 	[D*N-1:0]	dataout_n ;			// output data
-output 	[N-1:0]		clkout_p ;			// output clock
-output 	[N-1:0]		clkout_n ;			// output clock
+output 	[N-1:0]		clkout ;			// output clock
+output 	[D*N-1:0]	dataout ;		// non diff output data
 
 genvar i ;
 genvar j ;
@@ -82,10 +80,8 @@ serdes_7_to_1_diff_ddr #(
       	.D			(D),
       	.DATA_FORMAT		(DATA_FORMAT))
 dataout (
-	.dataout_p  		(dataout_p[D*(i+1)-1:D*i]),
-	.dataout_n  		(dataout_n[D*(i+1)-1:D*i]),
-	.clkout_p  		(clkout_p[i]),
-	.clkout_n  		(clkout_n[i]),
+	.dataout  		(dataout[D*(i+1)-1:D*i]),
+	.clkout  		(clkout[i]),
 	.txclk    		(txclk),
 	.pixel_clk    		(pixel_clk),
 	.txclk_div    		(txclk_div),

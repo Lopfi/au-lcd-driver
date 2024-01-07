@@ -64,7 +64,7 @@
 
 `timescale 1ps/1ps
 
-module serdes_7_to_1_diff_ddr (txclk, reset, pixel_clk, txclk_div, datain, clk_pattern, dataout_p, dataout_n, clkout_p, clkout_n) ;
+module serdes_7_to_1_diff_ddr (txclk, reset, pixel_clk, txclk_div, datain, clk_pattern, clkout, dataout) ;
 
 parameter integer 	D = 16 ;			// Set the number of outputs
 parameter         	DATA_FORMAT = "PER_CLOCK" ;     // Parameter Used to determine method for mapping input parallel word to output serial words
@@ -75,14 +75,11 @@ input 			pixel_clk ;			// clock at pixel rate
 input			txclk_div ;			// 1/2 rate clock output for gearbox
 input 	[(D*7)-1:0]	datain ;  			// Data for output
 input 	[6:0]		clk_pattern ;  			// clock pattern for output
-output 	[D-1:0]		dataout_p ;			// output data
-output 	[D-1:0]		dataout_n ;			// output data
-output 			clkout_p ;			// output clock
-output 			clkout_n ;			// output clock
+output 			clkout ;			// output clock
+output	[D-1:0]		dataout ;	// non diff output data
 
 wire	[D-1:0]		cascade_di ;	
 wire	[D-1:0]		cascade_ti ;	
-wire	[D-1:0]		tx_data_out ;	
 wire	[D*14-1:0]	mdataina ;	
 wire	[D*14-1:0]	mdatainb ;	
 reg			clockb2 ;
@@ -162,11 +159,6 @@ assign dataint = {datain, holdreg} ;
 generate
 for (i = 0 ; i <= (D-1) ; i = i+1) begin : loop0
 
-OBUFDS io_data_out (
-	.O    			(dataout_p[i]),
-	.OB       		(dataout_n[i]),
-	.I         		(tx_data_out[i]));
-
 // re-arrange data bits for transmission and invert lines as given by the mask
 // NOTE If pin inversion is required (non-zero SWAP MASK) then inverters will occur in fabric, as there are no inverters in the OSERDESE2
 // This can be avoided by doing the inversion (if necessary) in the user logic
@@ -193,7 +185,7 @@ OSERDESE2 #(
 	.DATA_RATE_TQ      	("SDR"), 		// <SDR>, DDR
 	.SERDES_MODE    	("MASTER"))  		// <DEFAULT>, MASTER, SLAVE
 oserdes_m (
-	.OQ       		(tx_data_out[i]),
+	.OQ       		(dataout[i]),
 	.OCE     		(1'b1),
 	.CLK    		(txclk),
 	.RST     		(reset_intr),
@@ -259,11 +251,6 @@ oserdes_s (
 end
 endgenerate
 
-OBUFDS io_clk_out (
-	.O    			(clkout_p),
-	.OB       		(clkout_n),
-	.I         		(tx_clk_out));
-
 OSERDESE2 #(
 	.DATA_WIDTH     	(14), 			// SERDES word width
 	.TRISTATE_WIDTH     	(1), 
@@ -271,7 +258,7 @@ OSERDESE2 #(
 	.DATA_RATE_TQ      	("SDR"), 		// <SDR>, DDR
 	.SERDES_MODE    	("MASTER"))  		// <DEFAULT>, MASTER, SLAVE
 oserdes_cm (
-	.OQ       		(tx_clk_out),
+	.OQ       		(clkout),
 	.OCE     		(1'b1),
 	.CLK    		(txclk),
 	.RST     		(reset_intr),
