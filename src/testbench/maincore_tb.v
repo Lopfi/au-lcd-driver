@@ -22,11 +22,12 @@ maincore uut(
 );
 
  initial begin 
-    rst = 0;
-    #10
+    #100
     rst = 1;
-    #10
+    #100
     rst = 0;
+    #100
+    rst = 1;
     
     #200000
     $finish;
