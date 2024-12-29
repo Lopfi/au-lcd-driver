@@ -4,15 +4,16 @@
 module maincore(
     input clk,	//100MHz clk in
     input rst,	//reset button
+	output led_en, led_pwm,
 	//lvds outputs
 	output clkout_p, clkout_n,
 	output [2:0] dataout_p, dataout_n  // lvds channel 1 data outputs
 	);
 
-parameter ScreenX = 1366;
-parameter ScreenY = 768;
+parameter ScreenX = 1366; //1366
+parameter ScreenY = 768;  //768
 parameter BlankingVertical = 12;
-parameter BlankingHorizontal = 169;
+parameter BlankingHorizontal = 174;
 
 parameter integer     D = 3 ;				// Set the number of outputs per channel to be 3
 parameter integer     N = 1 ;				// Set the number of channels to be 1
@@ -43,6 +44,9 @@ reg [7:0] SendFrames = 0;
 
 assign reset = ~rst;
 
+assign led_en = 1;
+assign led_pwm = 1;
+
 // Input Clock Buffer
 BUFG bg_ref (
     .I             (clk),
@@ -59,7 +63,6 @@ clk_wiz_72 clk_wiz_pixel(
 assign VideoData[20:14]	= {Blue[2],Blue[3],Blue[4],Blue[5],HSync,VSync,DataEnable};
 assign VideoData[13:7]  = {Green[1],Green[2],Green[3],Green[4],Green[5],Blue[0],Blue[1]};
 assign VideoData[6:0]	= {Red[0],Red[1],Red[2],Red[3],Red[4],Red[5],Green[0]};
-
 
 
 reg [5:0] Parallax = 0;
@@ -110,79 +113,61 @@ always @(posedge pixel_clk)
 begin
 			//Sync Generator
 			PosX <= PosX + 1;
-							
+			
+			// End of Screen in X				
 			if(PosX == ScreenX)
 			begin
 					DataEnable	 	<= 0;
 					HSync 			<= 0;
 			end
 			
+			// Start of line
 			if((PosX == 0) & (PosY < ScreenY))
 					DataEnable 	<= 1;
-				
-			if(PosX == (ScreenX+BlankingHorizontal))
-					HSync 			<= 1;
-						
+					
+			// End of line						
 			if(PosX == (ScreenX+BlankingHorizontal))
 			begin
+			        HSync 			<= 1;
+			        
+			        // End of Screen in Y
 					if(PosY == ScreenY)
 					begin
 							VSync 		<= 0;
 							DataEnable	<= 0;
 					end
 					
+					// End of Lines in Y
 					if(PosY == (ScreenY+BlankingVertical))
 					begin
 							VSync 		<= 1;
-							Parallax 	<= Parallax - 1;
 							PosY 	<= 0;
 							PosX 	<= 0;
 					end
 					else
-							PosY <= PosY +1;
+					begin
+					    	PosY <= PosY +1;
 					end
-						
-			if(PosX == (ScreenX+BlankingHorizontal))
+					
 					PosX 	<= 0;
+           end               
 end
+
 //Video Generator
 always @(posedge pixel_clk)
 begin
-		//if(PosX == ScreenX)
-		//begin
-				Blue 			<= 0;
-				Red 			<= 63;
-				Green 			<= 0;
-/*		end
-		else
+	if(PosX <= 100 && DataEnable)
 		begin
-			//Center 640x400 - Screen 640x480 -> Box: 640-320,400-240,640+320,400+240
-			
-			if( (PosX > 320 && PosY > 160) && ( PosX < 960 && PosY < 640) )
-			begin
-				// ScreenBox
-				Blue <= 0;
-				Red <= 0;
-				Green <= 0;
-			end
-			// 3px border: (317,160),(317,640),(319,640),(319,160)
-			// 3px border: (317,157),(960,157),(960,160),(317,160)
-			else if ( (PosX >= 317 && PosY >= 160 && PosY <= 640 && PosX <= 320) || 
-						 (PosX >= 317 && PosY >= 157 && PosY <= 160 && PosX <= 963) || 
-						 (PosX >= 960 && PosY >= 157 && PosY <= 640 && PosX <= 963) || 
-						 (PosX >= 317 && PosY >= 640 && PosY <= 643 && PosX <= 963)  )
-			begin
-					Red		<= 255;
-					Green		<= 0;
-					Blue		<= 0;
-			end
-			else
-			begin
-					Red	 	<= ( ( (PosY[5:0]+Parallax) ^ (PosX[5:0]+Parallax) 	) * 2	);
-					Blue 		<= ( ( (PosY[5:0]+Parallax) ^ (PosX[5:0]+Parallax) 	) * 3	);
-					Green 	<= ( ( (PosY[5:0]+Parallax) ^ (PosX[5:0]+Parallax) 	) * 4	);
-			end
+				Blue 			<= 63;
+				Red 			<= 0;
+				Green 			<= 0;
 		end
-		*/
+  	else
+		begin
+				Blue 			<= 0;
+				Red 			<= 0;
+				Green 			<= 0;
+		end  
 end
+
 endmodule

@@ -29,6 +29,9 @@ create_clock -period 10.00 -waveform {0 5} [get_ports clk];
 set_property -dict { PACKAGE_PIN P6   IOSTANDARD LVCMOS33 } [get_ports rst]; ## IO_25_14
 set_input_delay -clock clk -max 0.6 [get_ports rst];
 
+set_property -dict { PACKAGE_PIN T13   IOSTANDARD LVCMOS33 } [get_ports { led_en }];
+set_property -dict { PACKAGE_PIN R13   IOSTANDARD LVCMOS33 } [get_ports { led_pwm }];
+
 ## LVDS Outputs ##LVDS_25
 #set_property -dict { PACKAGE_PIN N3   IOSTANDARD LVDS_25 } [get_ports clkout_p]; ## C12
 #set_property -dict { PACKAGE_PIN N2   IOSTANDARD LVDS_25 } [get_ports clkout_n]; ## C11
@@ -39,6 +42,7 @@ set_input_delay -clock clk -max 0.6 [get_ports rst];
 #set_property -dict { PACKAGE_PIN P4   IOSTANDARD LVDS_25 } [get_ports dataout_p[2]]; ## C15
 #set_property -dict { PACKAGE_PIN P3   IOSTANDARD LVDS_25 } [get_ports dataout_n[2]]; ## C14
 
+# Original
 set_property -dict { PACKAGE_PIN G2   IOSTANDARD TMDS_33 } [get_ports clkout_p]; ## A21
 set_property -dict { PACKAGE_PIN G1   IOSTANDARD TMDS_33 } [get_ports clkout_n]; ## A20
 set_property -dict { PACKAGE_PIN H2   IOSTANDARD TMDS_33 } [get_ports dataout_p[2]]; ## A18

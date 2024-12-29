@@ -3,7 +3,7 @@
   "ip_inst": {
     "xci_name": "clk_wiz_72",
     "component_reference": "xilinx.com:ip:clk_wiz:6.0",
-    "ip_revision": "12",
+    "ip_revision": "15",
     "gen_directory": "../../../../LCD_Driver_AU.gen/sources_1/ip/clk_wiz_72",
     "parameters": {
       "component_parameters": {
@@ -597,12 +597,12 @@
       },
       "runtime_parameters": {
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
-        "IPREVISION": [ { "value": "12" } ],
+        "IPREVISION": [ { "value": "15" } ],
         "MANAGED": [ { "value": "TRUE" } ],
         "OUTPUTDIR": [ { "value": "../../../../LCD_Driver_AU.gen/sources_1/ip/clk_wiz_72" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
-        "SWVERSION": [ { "value": "2023.1.1" } ],
+        "SWVERSION": [ { "value": "2024.2" } ],
         "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
       }
     },

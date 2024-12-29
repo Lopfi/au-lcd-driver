@@ -29,7 +29,7 @@ maincore uut(
     #100
     rst = 1;
     
-    #200000
+    #20000000
     $finish;
 end
 
