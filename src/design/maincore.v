@@ -23,8 +23,8 @@ parameter FrontPorchVertical = 2;
 parameter BackPorchVertical = 2;
 parameter SyncPulseVertical = 8;
 
-parameter SyncOn = 1;
-parameter SyncOff = 0;
+parameter SyncOn = 0;
+parameter SyncOff = 1;
 
 parameter integer     D = 3 ;				// Set the number of outputs per channel to be 3
 parameter integer     N = 1 ;				// Set the number of channels to be 1
@@ -71,9 +71,8 @@ clk_wiz_72 clk_wiz_pixel(
     .reset(reset)
 	);
 
-assign VideoData[20:14]	= {Blue[2],Blue[3],Blue[4],Blue[5],HSync,VSync,DataEnable};
-assign VideoData[13:7]  = {Green[1],Green[2],Green[3],Green[4],Green[5],Blue[0],Blue[1]};
-assign VideoData[6:0]	= {Red[0],Red[1],Red[2],Red[3],Red[4],Red[5],Green[0]};
+assign VideoData[20:18] = {HSync, VSync, DataEnable}; // Move to higher bits
+assign VideoData[17:0]  = {Green[5:0], Red[5:0], Blue[5:0]};
 
 // Clock Input
 
@@ -176,18 +175,30 @@ end
 //Video Generator
 always @(posedge pixel_clk)
 begin
-	if(DataEnable)
-		begin
-				Blue 			<= 63;
-				Red 			<= 0;
-				Green 			<= 0;
-		end
-  	else
-		begin
-				Blue 			<= 0;
-				Red 			<= 0;
-				Green 			<= 0;
-		end  
+    if (DataEnable) begin
+        // Generate stripes based on the horizontal position (PosX)
+        if (PosX < ScreenX / 3) begin
+            // Red stripe
+            Red   <= 63;  // Maximum red
+            Green <= 0;   // No green
+            Blue  <= 0;   // No blue
+        end else if (PosX < 2 * ScreenX / 3) begin
+            // Green stripe
+            Red   <= 0;   // No red
+            Green <= 63;  // Maximum green
+            Blue  <= 0;   // No blue
+        end else begin
+            // Blue stripe
+            Red   <= 0;   // No red
+            Green <= 0;   // No green
+            Blue  <= 63;  // Maximum blue
+        end
+    end else begin
+        // Blank when data enable is off
+        Red   <= 0;
+        Green <= 0;
+        Blue  <= 0;
+    end
 end
 
 endmodule
