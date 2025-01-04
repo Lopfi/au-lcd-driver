@@ -177,22 +177,27 @@ always @(posedge pixel_clk)
 begin
     if (DataEnable) begin
         // Generate stripes based on the horizontal position (PosX)
-        if (PosX < ScreenX / 3) begin
+        if (PosX < ScreenX / 4) begin
             // Red stripe
             Red   <= 63;  // Maximum red
             Green <= 0;   // No green
             Blue  <= 0;   // No blue
-        end else if (PosX < 2 * ScreenX / 3) begin
+        end else if (PosX < ScreenX / 2) begin
             // Green stripe
             Red   <= 0;   // No red
             Green <= 63;  // Maximum green
             Blue  <= 0;   // No blue
-        end else begin
+        end else if (PosX < 3 * ScreenX / 4) begin
             // Blue stripe
             Red   <= 0;   // No red
             Green <= 0;   // No green
             Blue  <= 63;  // Maximum blue
-        end
+        end else begin
+			// White stripe
+			Red   <= 0;  // Maximum red
+			Green <= 0;  // Maximum green
+			Blue  <= 0;  // Maximum blue
+		end
     end else begin
         // Blank when data enable is off
         Red   <= 0;
