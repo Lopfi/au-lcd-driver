@@ -10,18 +10,18 @@ module maincore(
 	output [2:0] dataout_p, dataout_n  // lvds channel 1 data outputs
 	);
 
-parameter ScreenX = 1366; //1366
-parameter ScreenY = 768;  //768
-parameter BlankingVertical = 12;
-parameter BlankingHorizontal = 174;
+parameter ScreenX = 1600; //1366
+parameter ScreenY = 900;  //768
+parameter BlankingVertical = 26;
+parameter BlankingHorizontal = 128;
 
-parameter FrontPorchHorizontal = 30;
-parameter BackPorchHorizontal = 30;
-parameter SyncPulseHorizontal = 114;
+parameter FrontPorchHorizontal = 48;
+parameter BackPorchHorizontal = 48;
+parameter SyncPulseHorizontal = 32;
 
-parameter FrontPorchVertical = 2;
-parameter BackPorchVertical = 2;
-parameter SyncPulseVertical = 8;
+parameter FrontPorchVertical = 3;
+parameter BackPorchVertical = 18;
+parameter SyncPulseVertical = 5;
 
 parameter SyncOn = 0;
 parameter SyncOff = 1;
@@ -65,24 +65,24 @@ BUFG bg_ref (
 	);
 
 // Pixel Clock Generator
-clk_wiz_72 clk_wiz_pixel(
+clk_wiz_pixel clk_pixel(
     .clk_in(clk100_g),
     .clk_out(clk72_g),
     .reset(reset)
 	);
 
-assign VideoData[20:18] = {HSync, VSync, DataEnable}; // Move to higher bits
-assign VideoData[17:0]  = {Green[5:0], Red[5:0], Blue[5:0]};
+assign VideoData[20:14]	= {Blue[2],Blue[3],Blue[4],Blue[5],HSync,VSync,DataEnable};
+assign VideoData[13:7]  = {Green[1],Green[2],Green[3],Green[4],Green[5],Blue[0],Blue[1]};
+assign VideoData[6:0]	= {Red[0],Red[1],Red[2],Red[3],Red[4],Red[5],Green[0]};
 
 // Clock Input
-
 clock_generator_pll_7_to_1_diff_ddr #(
 	.PIXEL_CLOCK		("BUF_G"),
 	.INTER_CLOCK 		("BUF_G"),
 	.TX_CLOCK			("BUF_G"),
 	.USE_PLL			("FALSE"),
 	.MMCM_MODE			(2),				// Parameter to set multiplier for MMCM to get VCO in correct operating range. 1 multiplies input clock by 7, 2 multiplies clock by 14, etc
-	.CLKIN_PERIOD 		(13.889))
+	.CLKIN_PERIOD 		(10.416))          // 13.889
 clkgen (                        
 	.reset			(reset),
 	.clkin		    (clk72_g),
@@ -98,7 +98,7 @@ assign not_tx_mmcm_lckd = ~tx_mmcm_lckd ;
 n_x_serdes_7_to_1_diff_ddr #(
       	.D			(D),
       	.N			(N),				// 1 channel
-	.DATA_FORMAT 	("PER_CLOCK")) 			// PER_CLOCK or PER_CHANL data formatting
+	.DATA_FORMAT 	("PER_CHANL")) 			// PER_CLOCK or PER_CHANL data formatting
 dataout (                      
 	.dataout_p  	(dataout_p),
 	.dataout_n  	(dataout_n),
