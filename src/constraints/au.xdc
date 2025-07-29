@@ -13,21 +13,23 @@ create_clock -period 10.00 -waveform {0 5} [get_ports clk];
 
 ## LEDs
 
-#set_property -dict { PACKAGE_PIN K13   IOSTANDARD LVCMOS33 } [get_ports { LED[0] }];
-#set_property -dict { PACKAGE_PIN K12   IOSTANDARD LVCMOS33 } [get_ports { LED[1] }];
-#set_property -dict { PACKAGE_PIN L14   IOSTANDARD LVCMOS33 } [get_ports { LED[2] }];
-#set_property -dict { PACKAGE_PIN l13   IOSTANDARD LVCMOS33 } [get_ports { LED[3] }];
-#set_property -dict { PACKAGE_PIN M16   IOSTANDARD LVCMOS33 } [get_ports { LED[4] }];
-#set_property -dict { PACKAGE_PIN M14   IOSTANDARD LVCMOS33 } [get_ports { LED[5] }];
-#set_property -dict { PACKAGE_PIN M12   IOSTANDARD LVCMOS33 } [get_ports { LED[6] }];
-#set_property -dict { PACKAGE_PIN N16   IOSTANDARD LVCMOS33 } [get_ports { LED[7] }];
+set_property -dict { PACKAGE_PIN K13   IOSTANDARD LVCMOS33 } [get_ports { led[0] }];
+set_property -dict { PACKAGE_PIN K12   IOSTANDARD LVCMOS33 } [get_ports { led[1] }];
+set_property -dict { PACKAGE_PIN L14   IOSTANDARD LVCMOS33 } [get_ports { led[2] }];
+set_property -dict { PACKAGE_PIN l13   IOSTANDARD LVCMOS33 } [get_ports { led[3] }];
+set_property -dict { PACKAGE_PIN M16   IOSTANDARD LVCMOS33 } [get_ports { led[4] }];
+set_property -dict { PACKAGE_PIN M14   IOSTANDARD LVCMOS33 } [get_ports { led[5] }];
+set_property -dict { PACKAGE_PIN M12   IOSTANDARD LVCMOS33 } [get_ports { led[6] }];
+set_property -dict { PACKAGE_PIN N16   IOSTANDARD LVCMOS33 } [get_ports { led[7] }];
 
+set_property -dict { PACKAGE_PIN P15   IOSTANDARD LVCMOS33 } [get_ports { usb_tx }]; # Shared with USB_TXD ##BD14
+set_property -dict { PACKAGE_PIN P16   IOSTANDARD LVCMOS33 } [get_ports { usb_rx }]; # Shared with USB_RXD ##BD15
 
 
 ## Buttons
 
-set_property -dict { PACKAGE_PIN P6   IOSTANDARD LVCMOS33 } [get_ports rst]; ## IO_25_14
-set_input_delay -clock clk -max 0.6 [get_ports rst];
+set_property -dict { PACKAGE_PIN P6   IOSTANDARD LVCMOS33 } [get_ports rst_n]; ## IO_25_14
+set_input_delay -clock clk -max 0.6 [get_ports rst_n];
 
 set_property -dict { PACKAGE_PIN T13   IOSTANDARD LVCMOS33 } [get_ports { led_en }];
 set_property -dict { PACKAGE_PIN R13   IOSTANDARD LVCMOS33 } [get_ports { led_pwm }];

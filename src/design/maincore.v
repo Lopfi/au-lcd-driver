@@ -3,28 +3,31 @@
 
 module maincore(
     input clk,	//100MHz clk in
-    input rst,	//reset button
-	output led_en, led_pwm,
+    input rst_n, //active low reset
+    output[7:0] led, //status LEDss
+    input usb_rx, //USB RX
+    output usb_tx, //USB TX
+	output led_en, led_pwm, //LED enable and PWM control for screen backlight
 	//lvds outputs
 	output clkout_p, clkout_n,
 	output [2:0] dataout_p, dataout_n  // lvds channel 1 data outputs
 	);
 
-parameter ScreenX = 1600; //1366
-parameter ScreenY = 900;  //768
-parameter BlankingVertical = 26;
-parameter BlankingHorizontal = 128;
+parameter ScreenX = 1366; //1366
+parameter ScreenY = 768;  //768
+parameter BlankingVertical = 12;
+parameter BlankingHorizontal = 174;
 
-parameter FrontPorchHorizontal = 48;
-parameter BackPorchHorizontal = 48;
-parameter SyncPulseHorizontal = 32;
+parameter FrontPorchHorizontal = 30;
+parameter BackPorchHorizontal = 30;
+parameter SyncPulseHorizontal = 114;
 
 parameter FrontPorchVertical = 3;
-parameter BackPorchVertical = 18;
+parameter BackPorchVertical = 4;
 parameter SyncPulseVertical = 5;
 
-parameter SyncOn = 0;
-parameter SyncOff = 1;
+parameter SyncOn = 1;
+parameter SyncOff = ~SyncOn; 
 
 parameter integer     D = 3 ;				// Set the number of outputs per channel to be 3
 parameter integer     N = 1 ;				// Set the number of channels to be 1
@@ -33,7 +36,12 @@ wire clk100_g;
 wire clk72_g;
 wire pixel_clk;
 
-wire reset;
+wire rst;
+
+assign rst = ~rst_n;
+	
+assign led = rst ? 8'hAA : 8'h55; // debugging pattern
+assign usb_tx = usb_rx;
 
 reg [5:0] Red = 0;
 reg [5:0] Blue = 0;
@@ -53,8 +61,6 @@ reg DataEnable = 0;
 reg [10:0] PosX = 0;
 reg [10:0] PosY = 0;
 
-assign reset = ~rst;
-
 assign led_en = 1;
 assign led_pwm = 1;
 
@@ -68,23 +74,23 @@ BUFG bg_ref (
 clk_wiz_pixel clk_pixel(
     .clk_in(clk100_g),
     .clk_out(clk72_g),
-    .reset(reset)
+    .reset(rst)
 	);
 
-assign VideoData[20:14]	= {Blue[2],Blue[3],Blue[4],Blue[5],HSync,VSync,DataEnable};
-assign VideoData[13:7]  = {Green[1],Green[2],Green[3],Green[4],Green[5],Blue[0],Blue[1]};
-assign VideoData[6:0]	= {Red[0],Red[1],Red[2],Red[3],Red[4],Red[5],Green[0]};
+assign VideoData[20:18] = {HSync, VSync, DataEnable}; // Move to higher bits
+assign VideoData[17:0]  = {Green[5:0], Red[5:0], Blue[5:0]};
 
 // Clock Input
+
 clock_generator_pll_7_to_1_diff_ddr #(
 	.PIXEL_CLOCK		("BUF_G"),
 	.INTER_CLOCK 		("BUF_G"),
 	.TX_CLOCK			("BUF_G"),
 	.USE_PLL			("FALSE"),
 	.MMCM_MODE			(2),				// Parameter to set multiplier for MMCM to get VCO in correct operating range. 1 multiplies input clock by 7, 2 multiplies clock by 14, etc
-	.CLKIN_PERIOD 		(10.416))          // 13.889
+	.CLKIN_PERIOD 		(13.889))
 clkgen (                        
-	.reset			(reset),
+	.reset			(rst),
 	.clkin		    (clk72_g),
 	.txclk			(txclk),
 	.txclk_div		(txclk_div),
@@ -98,7 +104,7 @@ assign not_tx_mmcm_lckd = ~tx_mmcm_lckd ;
 n_x_serdes_7_to_1_diff_ddr #(
       	.D			(D),
       	.N			(N),				// 1 channel
-	.DATA_FORMAT 	("PER_CHANL")) 			// PER_CLOCK or PER_CHANL data formatting
+	.DATA_FORMAT 	("PER_CLOCK")) 			// PER_CLOCK or PER_CHANL data formatting
 dataout (                      
 	.dataout_p  	(dataout_p),
 	.dataout_n  	(dataout_n),
