@@ -13,21 +13,27 @@ module maincore(
 	output [2:0] dataout_p, dataout_n  // lvds channel 1 data outputs
 	);
 
-parameter ScreenX = 1366; //1366
-parameter ScreenY = 768;  //768
+parameter screnn_width = 1366; //1366
+parameter screnn_height = 768;  //768
+
+parameter frame_width = 1540; //1540
+parameter frame_height = 780; //780
+
 parameter BlankingVertical = 12;
 parameter BlankingHorizontal = 174;
 
+// Total horizontal blank time is 174 pixels
 parameter FrontPorchHorizontal = 30;
 parameter BackPorchHorizontal = 30;
-parameter SyncPulseHorizontal = 114;
+parameter hsync_pulse_size = 114;
 
+// Total vertical blank time is 12 lines
 parameter FrontPorchVertical = 3;
 parameter BackPorchVertical = 4;
-parameter SyncPulseVertical = 5;
+parameter vsync_pulse_size = 5;
 
-parameter SyncOn = 1;
-parameter SyncOff = ~SyncOn; 
+parameter sync_on = 1;
+parameter sync_off = ~sync_on; 
 
 parameter integer     D = 3 ;				// Set the number of outputs per channel to be 3
 parameter integer     N = 1 ;				// Set the number of channels to be 1
@@ -48,18 +54,18 @@ reg [5:0] Blue = 0;
 reg [5:0] Green = 0;
 
 wire [20:0] VideoData;
-wire		txclk ;			
-wire		txclk_div ;			
-wire		not_tx_mmcm_lckd ;	
-wire		tx_mmcm_lckd ;
+wire txclk ;			
+wire txclk_div ;			
+wire not_tx_mmcm_lckd ;	
+wire tx_mmcm_lckd ;
 
-reg HSync = SyncOff;
-reg VSync = SyncOff;
+reg hsync = sync_off;
+reg vsync = sync_off;
 reg DataEnable = 0;
 
 
-reg [10:0] PosX = 0;
-reg [10:0] PosY = 0;
+reg [10:0] pos_x = 0;
+reg [10:0] pos_y = 0;
 
 assign led_en = 1;
 assign led_pwm = 1;
@@ -77,7 +83,7 @@ clk_wiz_pixel clk_pixel(
     .reset(rst)
 	);
 
-assign VideoData[20:18] = {HSync, VSync, DataEnable}; // Move to higher bits
+assign VideoData[20:18] = {hsync, vsync, DataEnable}; // Move to higher bits
 assign VideoData[17:0]  = {Green[5:0], Red[5:0], Blue[5:0]};
 
 // Clock Input
@@ -124,56 +130,49 @@ dataout (
 always @(posedge pixel_clk)
 begin
 			// Increment horizontal position
-			PosX <= PosX + 1;
+			pos_x <= pos_x + 1;
 			
 			// Start horizontal blanking
-			if (PosX == ScreenX) begin
+			if (pos_x == screnn_width) begin
 				DataEnable <= 0;
 			end
 			
 			// Start horizontal sync
-			if (PosX == ScreenX + FrontPorchHorizontal) begin
-				HSync <= SyncOn;
+			if (pos_x == screnn_width + FrontPorchHorizontal) begin
+				hsync <= sync_on;
 			end
-
 			// End horizontal sync
-			if (PosX == ScreenX + FrontPorchHorizontal + SyncPulseHorizontal) begin
-				HSync <= SyncOff;
+			else if (pos_x == screnn_width + FrontPorchHorizontal + hsync_pulse_size) begin
+				hsync <= sync_off;
 			end
 					
 			// End of line						
-			if(PosX == (ScreenX+BlankingHorizontal))
-			begin
-			        PosX <= 0;
-					PosY <= PosY + 1;
+			if(pos_x == frame_width) begin
+			        pos_x <= 0;
+					pos_y <= pos_y + 1'b1;
 
         			// Start vertical blanking
-					if(PosY == ScreenY)
-					begin
+					if(pos_y == screnn_height) begin
 							DataEnable	<= 0;
 					end
 					
 					// Start vertical sync
-					if(PosY == ScreenY + FrontPorchVertical)
-					begin
-							VSync <= SyncOn;
+					if(pos_y == screnn_height + FrontPorchVertical)	begin
+							vsync <= sync_on;
 					end
 
 					// End vertical sync
-					if(PosY == ScreenY + FrontPorchVertical + SyncPulseVertical)
-					begin
-							VSync <= SyncOff;
+					if(pos_y == screnn_height + FrontPorchVertical + vsync_pulse_size) begin
+							vsync <= sync_off;
 					end
 
 					// End of frame
-					if(PosY == (ScreenY+BlankingVertical))
-					begin
-							PosY <= 0;
-							VSync <= SyncOff;
+					if(pos_y == (screnn_height + BlankingVertical)) begin
+							pos_y <= 0;
+							vsync <= sync_off;
 					end
            end
-		   else if (PosX == 0 && PosY < ScreenY)
-		   begin
+		   else if (pos_x == 0 && pos_y < screnn_height) begin
 				DataEnable <= 1;
 		   end             
 end
@@ -182,19 +181,19 @@ end
 always @(posedge pixel_clk)
 begin
     if (DataEnable) begin
-		if (PosY < ScreenY / 2) begin
-			// Generate stripes based on the horizontal position (PosX)
-			if (PosX < ScreenX / 4) begin
+		if (pos_y < screnn_height / 2) begin
+			// Generate stripes based on the horizontal position (pos_x)
+			if (pos_x < screnn_width / 4) begin
 				// Red stripe
 				Red   <= 63;  // Maximum red
 				Green <= 0;   // No green
 				Blue  <= 0;   // No blue
-			end else if (PosX < ScreenX / 2) begin
+			end else if (pos_x < screnn_width / 2) begin
 				// Green stripe
 				Red   <= 0;   // No red
 				Green <= 63;  // Maximum green
 				Blue  <= 0;   // No blue
-			end else if (PosX < 3 * ScreenX / 4) begin
+			end else if (pos_x < 3 * screnn_width / 4) begin
 				// Blue stripe
 				Red   <= 0;   // No red
 				Green <= 0;   // No green
