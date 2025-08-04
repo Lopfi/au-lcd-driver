@@ -19,20 +19,17 @@ parameter screnn_height = 768;  //768
 parameter frame_width = 1540; //1540
 parameter frame_height = 780; //780
 
-parameter BlankingVertical = 12;
-parameter BlankingHorizontal = 174;
-
 // Total horizontal blank time is 174 pixels
-parameter FrontPorchHorizontal = 30;
-parameter BackPorchHorizontal = 30;
-parameter hsync_pulse_size = 114;
+parameter FrontPorchHorizontal = 14;
+parameter hsync_pulse_size = 56;
+parameter BackPorchHorizontal = 104;
 
 // Total vertical blank time is 12 lines
 parameter FrontPorchVertical = 3;
-parameter BackPorchVertical = 4;
 parameter vsync_pulse_size = 5;
+parameter BackPorchVertical = 4;
 
-parameter sync_on = 1;
+parameter sync_on = 0;
 parameter sync_off = ~sync_on; 
 
 parameter integer     D = 3 ;				// Set the number of outputs per channel to be 3
@@ -167,7 +164,7 @@ begin
 					end
 
 					// End of frame
-					if(pos_y == (screnn_height + BlankingVertical)) begin
+					if(pos_y == (frame_height)) begin
 							pos_y <= 0;
 							vsync <= sync_off;
 					end
