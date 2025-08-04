@@ -49,9 +49,9 @@ assign rst = ~rst_n;
 assign led = rst ? 8'hAA : 8'h55; // debugging pattern
 assign usb_tx = usb_rx;
 
-reg [5:0] Red = 0;
-reg [5:0] Blue = 0;
-reg [5:0] Green = 0;
+reg [5:0] red = 0;
+reg [5:0] blue = 0;
+reg [5:0] green = 0;
 
 wire [20:0] VideoData;
 wire txclk ;			
@@ -61,7 +61,7 @@ wire tx_mmcm_lckd ;
 
 reg hsync = sync_off;
 reg vsync = sync_off;
-reg DataEnable = 0;
+reg data_en = 0;
 
 
 reg [10:0] pos_x = 0;
@@ -83,8 +83,8 @@ clk_wiz_pixel clk_pixel(
     .reset(rst)
 	);
 
-assign VideoData[20:18] = {hsync, vsync, DataEnable}; // Move to higher bits
-assign VideoData[17:0]  = {Green[5:0], Red[5:0], Blue[5:0]};
+assign VideoData[20:18] = {hsync, vsync, data_en}; // Move to higher bits
+assign VideoData[17:0]  = {green[5:0], red[5:0], blue[5:0]};
 
 // Clock Input
 
@@ -134,7 +134,7 @@ begin
 			
 			// Start horizontal blanking
 			if (pos_x == screnn_width) begin
-				DataEnable <= 0;
+				data_en <= 0;
 			end
 			
 			// Start horizontal sync
@@ -153,7 +153,7 @@ begin
 
         			// Start vertical blanking
 					if(pos_y == screnn_height) begin
-							DataEnable	<= 0;
+							data_en	<= 0;
 					end
 					
 					// Start vertical sync
@@ -173,47 +173,47 @@ begin
 					end
            end
 		   else if (pos_x == 0 && pos_y < screnn_height) begin
-				DataEnable <= 1;
+				data_en <= 1;
 		   end             
 end
 
 //Video Generator
 always @(posedge pixel_clk)
 begin
-    if (DataEnable) begin
+    if (data_en) begin
 		if (pos_y < screnn_height / 2) begin
 			// Generate stripes based on the horizontal position (pos_x)
 			if (pos_x < screnn_width / 4) begin
-				// Red stripe
-				Red   <= 63;  // Maximum red
-				Green <= 0;   // No green
-				Blue  <= 0;   // No blue
+				// red stripe
+				red   <= 63;  // Maximum red
+				green <= 0;   // No green
+				blue  <= 0;   // No blue
 			end else if (pos_x < screnn_width / 2) begin
-				// Green stripe
-				Red   <= 0;   // No red
-				Green <= 63;  // Maximum green
-				Blue  <= 0;   // No blue
+				// green stripe
+				red   <= 0;   // No red
+				green <= 63;  // Maximum green
+				blue  <= 0;   // No blue
 			end else if (pos_x < 3 * screnn_width / 4) begin
-				// Blue stripe
-				Red   <= 0;   // No red
-				Green <= 0;   // No green
-				Blue  <= 63;  // Maximum blue
+				// blue stripe
+				red   <= 0;   // No red
+				green <= 0;   // No green
+				blue  <= 63;  // Maximum blue
 			end else begin
 				// White stripe
-				Red   <= 0;  // Maximum red
-				Green <= 0;  // Maximum green
-				Blue  <= 0;  // Maximum blue
+				red   <= 0;  // Maximum red
+				green <= 0;  // Maximum green
+				blue  <= 0;  // Maximum blue
 			end
 		end else begin
-			Red   <= 0;  // No red
-			Green <= 0;  // No green
-			Blue  <= 0;  // No blue
+			red   <= 0;  // No red
+			green <= 0;  // No green
+			blue  <= 0;  // No blue
 		end
     end else begin
         // Blank when data enable is off
-        Red   <= 0;
-        Green <= 0;
-        Blue  <= 0;
+        red   <= 0;
+        green <= 0;
+        blue  <= 0;
     end
 end
 
