@@ -20,14 +20,14 @@ parameter frame_width = 1540; //1540
 parameter frame_height = 780; //780
 
 // Total horizontal blank time is 174 pixels
-parameter FrontPorchHorizontal = 14;
-parameter hsync_pulse_size = 56;
-parameter BackPorchHorizontal = 104;
+parameter H_FP = 14; // Horizontal Front Porch
+parameter H_SYNC = 56; // Horizontal Sync Pulse Size
+parameter H_BP = 104; // Horizontal Back Porch
 
 // Total vertical blank time is 12 lines
-parameter FrontPorchVertical = 3;
-parameter vsync_pulse_size = 5;
-parameter BackPorchVertical = 4;
+parameter V_FP = 3; // Vertical Front Porch
+parameter V_SYNC = 5; // Vertical Sync Pulse Size
+parameter V_BP = 4; // Vertical Back Porch
 
 parameter sync_on = 0;
 parameter sync_off = ~sync_on; 
@@ -122,57 +122,14 @@ dataout (
 	);
 
 
+assign data_en = (pos_x < screnn_width && pos_y < screnn_height);
 
-//Cycle Generator
-always @(posedge pixel_clk)
-begin
-			// Increment horizontal position
-			pos_x <= pos_x + 1;
-			
-			// Start horizontal blanking
-			if (pos_x == screnn_width) begin
-				data_en <= 0;
-			end
-			
-			// Start horizontal sync
-			if (pos_x == screnn_width + FrontPorchHorizontal) begin
-				hsync <= sync_on;
-			end
-			// End horizontal sync
-			else if (pos_x == screnn_width + FrontPorchHorizontal + hsync_pulse_size) begin
-				hsync <= sync_off;
-			end
-					
-			// End of line						
-			if(pos_x == frame_width) begin
-			        pos_x <= 0;
-					pos_y <= pos_y + 1'b1;
+assign hsync = ~((pos_x >= (screnn_width + H_FP)) &&
+                 (pos_x <  (screnn_width + H_FP + H_SYNC)));
 
-        			// Start vertical blanking
-					if(pos_y == screnn_height) begin
-							data_en	<= 0;
-					end
-					
-					// Start vertical sync
-					if(pos_y == screnn_height + FrontPorchVertical)	begin
-							vsync <= sync_on;
-					end
 
-					// End vertical sync
-					if(pos_y == screnn_height + FrontPorchVertical + vsync_pulse_size) begin
-							vsync <= sync_off;
-					end
-
-					// End of frame
-					if(pos_y == (frame_height)) begin
-							pos_y <= 0;
-							vsync <= sync_off;
-					end
-           end
-		   else if (pos_x == 0 && pos_y < screnn_height) begin
-				data_en <= 1;
-		   end             
-end
+assign vsync = ~((pos_y >= (V_ACTIVE + V_FP)) &&
+                 (pos_y <  (V_ACTIVE + V_FP + V_SYNC)));
 
 //Video Generator
 always @(posedge pixel_clk)
