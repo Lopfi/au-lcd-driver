@@ -29,12 +29,6 @@ parameter V_FP = 3; // Vertical Front Porch
 parameter V_SYNC = 5; // Vertical Sync Pulse Size
 parameter V_BP = 4; // Vertical Back Porch
 
-parameter sync_on = 0;
-parameter sync_off = ~sync_on; 
-
-parameter integer     D = 3 ;				// Set the number of outputs per channel to be 3
-parameter integer     N = 1 ;				// Set the number of channels to be 1
-
 wire clk100_g;
 wire clk72_g;
 wire pixel_clk;
@@ -56,9 +50,9 @@ wire txclk_div ;
 wire not_tx_mmcm_lckd ;	
 wire tx_mmcm_lckd ;
 
-reg hsync = sync_off;
-reg vsync = sync_off;
-reg data_en = 0;
+wire hsync;
+wire vsync;
+wire data_en;
 
 
 reg [10:0] pos_x = 0;
@@ -80,8 +74,12 @@ clk_wiz_pixel clk_pixel(
     .reset(rst)
 	);
 
-assign VideoData[20:18] = {hsync, vsync, data_en}; // Move to higher bits
-assign VideoData[17:0]  = {green[5:0], red[5:0], blue[5:0]};
+//assign VideoData[20:18] = {hsync, vsync, data_en}; // Move to higher bits
+//assign VideoData[17:0]  = {green[5:0], red[5:0], blue[5:0]};
+
+assign VideoData[20:14]	= {hsync, vsync, data_en, green[5], green[4], green[3], green[2]};
+assign VideoData[13:7]  = {green[1], green[0], red[5], red[4], red[3], red[2], red[1]};
+assign VideoData[6:0]	= {red[0], blue[5], blue[4], blue[3], blue[2], blue[1], blue[0]};
 
 // Clock Input
 
@@ -104,9 +102,9 @@ clkgen (
 assign not_tx_mmcm_lckd = ~tx_mmcm_lckd ;
 
 // Transmitter Logic for N D-bit channels
-n_x_serdes_7_to_1_diff_ddr #(
-      	.D			(D),
-      	.N			(N),				// 1 channel
+n_x_serdes_7_to_1_diff_ddr #(				
+      	.D			(3),					// Set the number of data bits per channel to 3
+      	.N			(1),					// Set the number of channels to be 1
 	.DATA_FORMAT 	("PER_CLOCK")) 			// PER_CLOCK or PER_CHANL data formatting
 dataout (                      
 	.dataout_p  	(dataout_p),
@@ -128,8 +126,26 @@ assign hsync = ~((pos_x >= (screnn_width + H_FP)) &&
                  (pos_x <  (screnn_width + H_FP + H_SYNC)));
 
 
-assign vsync = ~((pos_y >= (V_ACTIVE + V_FP)) &&
-                 (pos_y <  (V_ACTIVE + V_FP + V_SYNC)));
+assign vsync = ~((pos_y >= (screnn_height + V_FP)) &&
+                 (pos_y <  (screnn_height + V_FP + V_SYNC)));
+
+//Cycle Generator
+always @(posedge pixel_clk)
+begin
+			// Increment horizontal position
+
+			if (pos_x < frame_width) begin
+				pos_x <= pos_x + 1;
+			end
+			else begin
+				pos_x <= 0; // Reset horizontal position
+				if (pos_y < frame_height) begin
+					pos_y <= pos_y + 1; // Increment vertical position
+				end else begin
+					pos_y <= 0; // Reset vertical position if at the end of the frame
+				end
+			end
+end
 
 //Video Generator
 always @(posedge pixel_clk)
@@ -153,7 +169,7 @@ begin
 				green <= 0;   // No green
 				blue  <= 63;  // Maximum blue
 			end else begin
-				// White stripe
+				// black stripe
 				red   <= 0;  // Maximum red
 				green <= 0;  // Maximum green
 				blue  <= 0;  // Maximum blue
