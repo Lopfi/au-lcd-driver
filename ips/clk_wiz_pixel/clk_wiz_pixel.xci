@@ -602,7 +602,7 @@
         "OUTPUTDIR": [ { "value": "../../vivado_project/au-lcd-driver.gen/sources_1/ip/clk_wiz_pixel" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
-        "SWVERSION": [ { "value": "2024.2" } ],
+        "SWVERSION": [ { "value": "2024.2.1" } ],
         "SYNTHESISFLOW": [ { "value": "GLOBAL" } ]
       }
     },
