@@ -77,9 +77,9 @@ clk_wiz_pixel clk_pixel(
 //assign VideoData[20:18] = {hsync, vsync, data_en}; // Move to higher bits
 //assign VideoData[17:0]  = {green[5:0], red[5:0], blue[5:0]};
 
-assign VideoData[20:14]	= {hsync, vsync, data_en, green[5], green[4], green[3], green[2]};
-assign VideoData[13:7]  = {green[1], green[0], red[5], red[4], red[3], red[2], red[1]};
-assign VideoData[6:0]	= {red[0], blue[5], blue[4], blue[3], blue[2], blue[1], blue[0]};
+assign VideoData[6:0]	= {green[0], red[5], red[4], red[3], red[2], red[1], red[0]};  // pair 0
+assign VideoData[13:7]  = {blue[1], blue[0], green[5], green[4], green[3], green[2], green[1]};    // pair 1
+assign VideoData[20:14]	= {data_en, vsync, hsync, blue[5], blue[4], blue[3], blue[2]}; // pair 2
 
 // Clock Input
 
@@ -87,9 +87,9 @@ clock_generator_pll_7_to_1_diff_ddr #(
 	.PIXEL_CLOCK		("BUF_G"),
 	.INTER_CLOCK 		("BUF_G"),
 	.TX_CLOCK			("BUF_G"),
-	.USE_PLL			("FALSE"),
+	.USE_PLL			("TRUE"),
 	.MMCM_MODE			(2),				// Parameter to set multiplier for MMCM to get VCO in correct operating range. 1 multiplies input clock by 7, 2 multiplies clock by 14, etc
-	.CLKIN_PERIOD 		(13.889))
+	.CLKIN_PERIOD 		(10.417)) // 13.889ns = 72MHz; 10.417ns = 96MHz
 clkgen (                        
 	.reset			(rst),
 	.clkin		    (clk72_g),
@@ -105,7 +105,7 @@ assign not_tx_mmcm_lckd = ~tx_mmcm_lckd ;
 n_x_serdes_7_to_1_diff_ddr #(				
       	.D			(3),					// Set the number of data bits per channel to 3
       	.N			(1),					// Set the number of channels to be 1
-	.DATA_FORMAT 	("PER_CLOCK")) 			// PER_CLOCK or PER_CHANL data formatting
+	.DATA_FORMAT 	("PER_CHANL")) 			// PER_CLOCK or PER_CHANL data formatting
 dataout (                      
 	.dataout_p  	(dataout_p),
 	.dataout_n  	(dataout_n),
