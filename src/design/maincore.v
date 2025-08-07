@@ -13,21 +13,21 @@ module maincore(
 	output [2:0] dataout_p, dataout_n  // lvds channel 1 data outputs
 	);
 
-parameter screnn_width = 1366; //1366
-parameter screnn_height = 768;  //768
+parameter screnn_width = 1600; //1366
+parameter screnn_height = 900;  //768
 
-parameter frame_width = 1540; //1540
-parameter frame_height = 780; //780
+parameter frame_width = 1728; //1540
+parameter frame_height = 926; //780
 
 // Total horizontal blank time is 174 pixels
-parameter H_FP = 14; // Horizontal Front Porch
-parameter H_SYNC = 56; // Horizontal Sync Pulse Size
-parameter H_BP = 104; // Horizontal Back Porch
+parameter H_FP = 48; // Horizontal Front Porch
+parameter H_SYNC = 32; // Horizontal Sync Pulse Size
+parameter H_BP = 48; // Horizontal Back Porch
 
 // Total vertical blank time is 12 lines
 parameter V_FP = 3; // Vertical Front Porch
 parameter V_SYNC = 5; // Vertical Sync Pulse Size
-parameter V_BP = 4; // Vertical Back Porch
+parameter V_BP = 18; // Vertical Back Porch
 
 wire clk100_g;
 wire clk72_g;
